@@ -1,0 +1,358 @@
+https://github.com/HectorMontoya27/Tarea_6
+
+/* Primera Gramatica */
+
+0 - S'-> S
+1 - S -> SS+
+2 - S -> SS*
+3 - S -> a
+
+i0={S'-> ·S,$
+    S -> ·SS+,$/a
+    S -> ·SS*,$/a
+    S -> ·a,$/a}
+
+goto(i0,S){
+    S'-> S·,$
+    S -> S·S+,$/a
+    S -> S·S*,$/a
+    S -> ·SS+,+/*
+    S -> ·SS*,+/*
+    S -> ·a,+/*
+} = i1
+
+goto(i0,a){
+    S -> a·,$/a
+} = i2
+
+goto(i1,S){
+    S -> SS·+,$/a
+    S -> SS·*,$/a
+    S -> S·S+,+/*
+    S -> S·S*,+/*
+    S -> ·SS+,+/*
+    S -> ·SS*,+/*
+    S -> ·a,+/*
+} = i3
+
+goto(i1,a){
+    S -> a·,+/*
+} = i4
+
+goto(i3,S){
+    S -> SS·+,+/*
+    S -> SS·*,+/*
+    S -> S·S+,+/*
+    S -> S·S*,+/*
+    S -> ·SS+,+/*
+    S -> ·SS*,+/*
+    S -> ·a,+/*
+} = i5
+
+goto(i3,a) = i4
+
+goto(i3,+){
+    S -> SS+·,$/a
+} = i6
+
+goto(i3,*){
+    S -> SS*·,$/a
+} = i7
+
+goto(i5,S) = i5
+
+goto(i5,a) = i4
+
+goto(i5,+){
+    S -> SS+·,+/*
+} = i8
+
+goto(i5,*){
+    S -> SS*·,+/*
+} = i9
+
+
+LR(1)
+      a     +     *     $     S
+0     d2                      1
+1     d4               acep   3
+2     r3                r3
+3     d4    d6    d7          5
+4           r3    r3
+5     d4    d8    d7          5
+6     r1                r1
+7     r2                r2
+8           r1    r1
+9           r2    r2
+
+Pila    Entrada    Accion
+$0      aa+a*$    desplazar 2
+$02     a+a*$     reducir S -> a
+$01     a+a*$     desplazar 4
+$014    +a*$      reducir S -> a
+$013    +a*$      desplazar 6
+$0136   a*$       reducir S -> SS+
+$01     a*$       desplazar 4
+$014    *$        reducir S -> a
+$013    *$        desplazar 7
+$0137   $         reducir S -> SS*
+$01     $         aceptar
+
+LRLA
+a     +     *     $     S
+0     d2                      1
+1     d4               acep   3
+2     r3    r3    r3    r3
+3     d2    d4    d5          5
+4     r1    r1    r1    r1
+5     r2    r2    r2    r2
+
+
+/* Segunda Gramatica */
+
+0 - S'-> S
+1 - S -> V = E
+2 - E -> V
+3 - E -> n
+4 - V -> id
+
+i0={S'-> ·S,$
+    S -> ·V = E,$
+    V -> ·id,= }
+
+goto(i0,S){
+    S'-> S·,$
+} = i1
+
+goto(i0,V){
+    S -> V ·= E,$
+} = i2
+
+goto(i0,id){
+    V -> id·,=
+} = i3
+
+goto(i2,=){
+    S -> V = ·E,$
+    E -> ·V,$
+    E -> ·n,$
+    V -> ·id,$
+} = i4
+
+goto(i4,E){
+    S -> V = E·,$
+} = i5
+
+goto(i4,V){
+    E -> V·,$
+} = i6
+
+goto(i4,n){
+    E -> n·,$
+} = i7
+
+goto(i4,id){
+    V -> id·,$
+} = i8
+
+LR(1)
+      =     n     id      $     S     E     V
+0                 d3            1           2
+1                        acep
+2     d4
+3     r4
+4           d7    d8                  5     6
+5                         r1
+6                         r2
+7                         r3
+8                         r4
+
+Pila    Entrada   Accion
+$0      x=6$      desplazar 3
+$03     =6$       reducir V -> id
+$02     =6$       desplazar 3
+$024    6$        desplazar 7
+$0247   $         reducir E -> n
+$0245   $         reducir S -> V = E
+$01     $         aceptar
+
+/* Tercera gramatica */
+
+0 - S'-> S
+1 - S -> A
+2 - S -> xb
+3 - A -> aAb
+4 - A -> B
+5 - B -> x
+
+i0={S'-> ·S,$
+    S -> ·A,$
+    S -> ·xb,$
+    A -> ·aAb,$
+    A -> ·B,$
+    B -> ·x,$ }
+
+goto(i0,S){
+    S'-> S·,$
+} = i1
+
+goto(i0,A){
+    S -> A·,$
+} = i2
+
+goto(i0,x){
+    S -> x·b,$
+    B -> x·,$
+} = i3
+
+goto(i0,a){
+    A -> a·Ab,$
+    A -> ·aAb,b
+    A -> ·B,b
+    B -> ·x,b
+} = i4
+
+goto(i0,B){
+    A -> B·,$
+} = i5
+
+goto(i3,b){
+    S -> xb·,$
+} = i6
+
+goto(i4,A){
+    A -> aA·b,$
+} = i7
+
+goto(i4,a){
+    A -> a·Ab,b
+    A -> ·aAb,b
+    A -> ·B,b
+    B -> ·x,b
+} = i8
+
+goto(i4,b){
+    A -> B·,b
+} = i9
+
+goto(i4,x){
+    B -> x·,b
+} = i10
+
+goto(i7,b){
+    A -> aAb·,$
+} = i11
+
+goto(i8,A){
+    A -> aA·b,b
+} = i12
+
+goto(i8,a) = i8
+
+goto(i8,B) = i9
+
+goto(i8,x) = i10
+
+goto(i12,b){
+    A -> aAb·,b
+} = i13
+
+LR(1)
+      a     b     x     $     S     A     B
+0     d4          d3          1     2     5
+1                      acep
+2                       r1
+3           d6          r5
+4     d8          d10               7     5
+5                       r5
+6                       r2
+7           d11
+8     d8          d10               12    9
+9           r4
+10          r5
+11                      r3
+12          d13
+13          r3
+
+LALR
+      a     b     x     $     S     A     B
+0     d4          d3          1     2     5
+1                      acep
+2                       r1
+3           d6          r5
+4     d4          d8                7     5
+5           r4          r5
+6                       r2
+7           d9
+8           r5
+9           r3          r3
+10          d9
+
+Pila    Entrada   Accion
+$0      axbb$     desplazar 4
+$04     xbb$      desplazar 8
+$048    bb$       reducir B -> x
+$045    bb$       reducir A -> B
+$047    bb$       desplazar 9
+$0479   b$        reducir A -> aAb
+$02     b$        error
+
+/* cuarta gramatica  */
+
+0 - T'-> T
+1 - T -> TF
+2 - T -> F
+3 - F -> F*
+4 - F -> a
+
+i0={T'-> ·T,$
+    T -> ·TF,$
+    T -> ·F,$
+    F -> ·F*,$/*
+    F -> ·a,$/* }
+
+goto(i0,T){
+    T'-> T·,$
+    T -> T·F,$
+    F -> ·F*,$/*
+    F -> ·a,$/*
+} = i1
+
+goto(i0,F){
+    T -> F·,$
+    F -> F·*,$/*
+} = i2
+
+goto(i0,a){
+    F -> a·,$/*
+} = i3
+
+goto(i1,F){
+    T -> TF·,$
+    F -> F·*,$/*
+} = i4
+
+goto(i1,a) = i3
+
+goto(i2,*){
+    F -> F*·,$/*
+} = i5
+
+goto(i4,*) = i5
+
+LR(1)
+      a     *     $     T     F
+0     d3                1     2
+1     d3         acep         4
+2           d5    r2
+3           r4    r4
+4           d5    r1
+5           r3    r3
+
+Pila    Entrada   Accion
+$0      a**aa$    desplazar 3
+$03     **aa$     reducir F -> a
+$02     **aa$     desplazar 5
+$025    *aa$      reducir F -> F*
+$02     *aa$      desplazar 5
+$025    aa$       error
